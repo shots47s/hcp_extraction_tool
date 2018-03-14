@@ -3,6 +3,7 @@ import glob
 import tarfile
 import argparse
 import errno
+import multiprocessing
 
 
 def parseCommandLine():
@@ -17,6 +18,8 @@ def parseCommandLine():
                         help='Directory to store the output of the extraction')
     parser.add_argument('--hcpdir','-p', type=lambda x: dir_exists(parser,x),
                         help='Location of the HCP data you would like to extract from')
+    parser.add_argument('--numprocs','-n',default=1,
+                        help='Number of processors to use')
 
     return parser.parse_args()
 
@@ -30,6 +33,22 @@ def dir_exists(parser,x):
         parser.error('Directory Not Found: {0}'.format(x))
     return x
 
+def extractFromSubject(subjectId, opts, extractionStrings):
+    print "Extracting {0}".format(subjectId)
+    tarFileName = "{0}/{1}.tar".format(opts.hcpdir,subjectId)
+    with tarfile.open(tarFileName) as t:
+        subdirs = [ tarinfo for tarinfo in t.getmembers() ]
+        extractSubs = []
+        for e in extractionStrings:
+            for sd in subdirs:
+                if sd.name.find(e) > -1:
+                    extractSubs.append(sd)
+                    
+        t.extractall(members=extractSubs)
+
+def extractHelper(args):
+    return extractFromSubject(*args)
+        
 def main():
     opts = parseCommandLine()
 
@@ -63,25 +82,31 @@ def main():
         if exc.errno == errno.EEXIST and os.path.isdir(opts.outputdir):
             pass
 
-    os.chdir(opts.outputdir) 
-    for s in goodSubjects:
-        print "Extracting data for subject {0}".format(s)
+    os.chdir(opts.outputdir)
+
+    jobArgs = [(x, opts, extractionStrings) for x in goodSubjects]
+    
+    p = multiprocessing.Pool(opts.numprocs)
+    p.map(extractFromSubject,jobArgs)
+
+#    for s in goodSubjects:
+#        print "Extracting data for subject {0}".format(s)
         #try: 
         #    os.makedirs("{0}/{1}".format(opts.outputdir,s))
         #except OSError as exc: 
         #    if exc.errno == errno.EEXIST and os.path.isdir(opts.outputdir): 
         #        pass
         #os.chdir("{0}/{1}".format(opts.outputdir,s))
-        tarFileName = "{0}/{1}.tar".format(opts.hcpdir,s)
-        with tarfile.open(tarFileName) as t:
-            subdirs = [ tarinfo for tarinfo in t.getmembers() ]
-            extractSubs = []
-            for e in extractionStrings:
-                for sd in subdirs:
-                    if sd.name.find(e) > -1:
-                        extractSubs.append(sd)
-
-            t.extractall(members=extractSubs)
+#        tarFileName = "{0}/{1}.tar".format(opts.hcpdir,s)
+#        with tarfile.open(tarFileName) as t:
+#            subdirs = [ tarinfo for tarinfo in t.getmembers() ]
+#            extractSubs = []
+#            for e in extractionStrings:
+#                for sd in subdirs:
+#                    if sd.name.find(e) > -1:
+#                        extractSubs.append(sd)
+#
+#            t.extractall(members=extractSubs)
         #os.chdir("..")
 
 if __name__ == "__main__":
