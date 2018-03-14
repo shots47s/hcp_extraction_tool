@@ -6,6 +6,7 @@ This tool is special purpose as it works on the HCP data with the dataset tarred
 
 To use the tool:
 
+```
 usage: extract_from_hcp.py [-h] [--subjectfile SUBJECTFILE]
                            [--extractfile EXTRACTFILE] [--outputdir OUTPUTDIR]
                            [--hcpdir HCPDIR]
@@ -23,6 +24,7 @@ optional arguments:
   --hcpdir HCPDIR, -p HCPDIR
                         Location of the HCP data you would like to extract
                         from
+```
 
 The result will be the directory specified by outputdir that has the subset of the files that you asked to be extracted.
 
