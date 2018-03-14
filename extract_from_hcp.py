@@ -87,7 +87,7 @@ def main():
     jobArgs = [(x, opts, extractionStrings) for x in goodSubjects]
     
     p = multiprocessing.Pool(opts.numprocs)
-    p.map(extractFromSubject,jobArgs)
+    p.map(extractHelper,jobArgs)
 
 #    for s in goodSubjects:
 #        print "Extracting data for subject {0}".format(s)
