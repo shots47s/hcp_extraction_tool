@@ -18,7 +18,7 @@ def parseCommandLine():
                         help='Directory to store the output of the extraction')
     parser.add_argument('--hcpdir','-p', type=lambda x: dir_exists(parser,x),
                         help='Location of the HCP data you would like to extract from')
-    parser.add_argument('--numprocs','-n',default=1,
+    parser.add_argument('--numprocs','-n',default=1, type=int,
                         help='Number of processors to use')
 
     return parser.parse_args()
