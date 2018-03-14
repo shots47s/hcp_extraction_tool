@@ -1,0 +1,6 @@
+T1w_acpc_dc_restore_1.25.nii.gz 
+T1w/Diffusion/bvals
+T1w/Diffusion/bvecs
+T1w/Diffusion/data.nii.gz
+T1w/Diffusion/nodif_brain_mask.nii.gz
+T1w/Diffusion/grad_dev.nii.gz
